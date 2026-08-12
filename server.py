@@ -25,12 +25,14 @@ def stream_song(query: str):
     Takes a search query, finds the top YouTube result,
     extracts the raw audio stream, and pipes it to the app.
     """
-    ydl_opts = {
+        ydl_opts = {
         'format': 'bestaudio[ext=m4a]/bestaudio/best', 
         'noplaylist': True,
         'quiet': True,
-        'extract_flat': False
-    }
+        'extract_flat': False,
+        'extractor_args': {'youtube': ['client=android']} # THIS IS THE FIX
+        }
+
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
