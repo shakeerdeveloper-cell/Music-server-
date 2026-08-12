@@ -21,20 +21,20 @@ def home():
 @app.get("/stream")
 def stream_song(query: str):
     """
-    Takes a search query, finds the top YouTube result,
+    Takes a search query, finds the top SoundCloud result,
     extracts the raw audio stream, and pipes it to the app.
     """
     ydl_opts = {
-        'format': 'bestaudio[ext=m4a]/bestaudio/best', 
+        'format': 'bestaudio/best', 
         'noplaylist': True,
         'quiet': True,
-        'extract_flat': False,
-        'extractor_args': {'youtube': ['client=android']}
+        'extract_flat': False
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch1:{query}", download=False)
+            # CHANGED: Now searches SoundCloud (scsearch1) instead of YouTube (ytsearch1)
+            info = ydl.extract_info(f"scsearch1:{query}", download=False)
             
             if 'entries' not in info or len(info['entries']) == 0:
                 raise HTTPException(status_code=404, detail="Song not found")
@@ -47,9 +47,9 @@ def stream_song(query: str):
                         if chunk:
                             yield chunk
 
-            return StreamingResponse(stream_generator(), media_type="audio/mp4")
+            return StreamingResponse(stream_generator(), media_type="audio/mp3")
 
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch stream")
-            
+        
